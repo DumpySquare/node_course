@@ -1,6 +1,8 @@
 const path = require('path')
 const express = require('express')
 const hbs = require('hbs')
+const geocode = require('./utils/geocode.js')
+const forcast = require('./utils/forcast.js')
 
 // initiates express in node
 const app = express()
@@ -45,9 +47,46 @@ app.get('/help', (req, res) => {
 
 // when user requests url, respond with json body defined
 app.get('/weather', (req, res) => {
+    if (!req.query.address) {
+        return res.send({
+            error: 'provide an address to get the weather for that location'
+        })
+    }
+    
+    geocode(req.query.address, (error, { latitude, longitude, location } = {}) => {
+        if (error) {
+            return res.send({ error })
+        }
+        console.log(req.query.address)
+        console.log(location)
+        console.log(latitude)
+        console.log(longitude)
+        forcast(latitude, longitude, (error, forcastData) => {
+            if (error) {
+                return res.send({ error })
+            }
+            console.log(forcastData)
+
+            res.send({
+                address: req.query.address,
+                location,
+                forcast: forcastData
+            })
+        })
+    })
+
+})
+
+app.get('/products', (req, res) => {
+    console.log('\nProducts request query: ', req.query.search)
+
+    if (!req.query.search) {
+        return res.send({
+            error: 'Provide a search term'
+        })
+    }
     res.send({
-        location: 'spring hill, tn',
-        forcast: 'awesome with a sprits of noice!'
+        products: []
     })
 })
 
