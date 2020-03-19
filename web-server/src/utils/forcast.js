@@ -12,8 +12,12 @@ const forcast = (latitude, longitude, callback) => {
         } else {
             const dailySum = body.daily.data[0].summary
             const temp = body.currently.temperature
-            const precipProb = body.currently.precipProbability
-            callback(undefined, `${dailySum} Is is currently ${temp} degrees out.  There is a ${precipProb}% chance it is going to rain\n`)
+            // get rain probability, then convert to percentage
+            const precipProb = body.currently.precipProbability * 100
+            const humid = body.currently.humidity
+            const pressure = body.currently.pressure
+            //console.log(body.daily.data[0])
+            callback(undefined, `${dailySum} Is is currently ${temp} degrees out.  There is a ${precipProb}% chance it is going to rain.  Humidity: ${humid}  Pressure: ${pressure}`)
         }
     })
 }
