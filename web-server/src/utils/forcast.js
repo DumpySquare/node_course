@@ -17,7 +17,7 @@ const forcast = (latitude, longitude, callback) => {
             const humid = body.currently.humidity
             const pressure = body.currently.pressure
             //console.log(body.daily.data[0])
-            callback(undefined, `${dailySum} Is is currently ${temp} degrees out.  There is a ${precipProb}% chance it is going to rain.  Humidity: ${humid}  Pressure: ${pressure}`)
+            callback(undefined, `${dailySum} It is currently ${temp} degrees out.  There is a ${precipProb}% chance it is going to rain.  Humidity: ${humid}  Pressure: ${pressure}`)
         }
     })
 }
