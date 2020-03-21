@@ -1,22 +1,35 @@
 # node_course
 node course q1 2020
 
+Udemy: Complete NodeJS Developer Course
 
-https://bengordon-weather-application.herokuapp.com/
+    https://www.udemy.com/course/the-complete-nodejs-developer-course-2
+By Andew Mead @ mead.io
+
+    https://mead.io/
+
+Weather app built from course, running on Heroku
+
+    https://bengordon-weather-application.herokuapp.com/
 
 ---
 
 # Git commands
+Add all files to stage
+>git add .
+Commit files with comment about the changes
+>git commit -m "setup app for heroku"
+Push changes to master branch in github
+>git push
 
-git add .
-git commit -m "setup app for heroku"
-git push
+Sets the Heroku remote in parallel with github
+>heroku git:remote -a bengordon-weather-application
 
-heroku git:remote -a bengordon-weather-application
+This doesn't work because the web-server app is in a sub folder of the entire class git.  The class had only setup the web-server app as a git.  I setup the entire project folder.  When it tried to push the entire project folder, it couldn't find a package.json file at the root to understand how to deploy and run the app.
+>git push heroku master
 
-git push heroku master
-
-git subtree push --prefix web-server/ heroku master
+push the webserver sub-tree
+>git subtree push --prefix web-server/ heroku master
 
 Deploying subtree of git project to heroku
 
