@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const Task = require('./task')
 
 
 const userSchema = new mongoose.Schema({
@@ -40,8 +42,35 @@ const userSchema = new mongoose.Schema({
                 throw new Error('Age must be a postitive number')
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 })
+
+// associates owner field of a Task with the local user field _id
+//    so we can find all tasks by a user
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
+// setup public user data
+userSchema.methods.toJSON = function () {
+    // capture user data passed in from the function call
+    const user = this
+    // convert it to an object
+    const userObject = user.toObject()
+    // delete the object items we don't want to expose
+    delete userObject.password
+    delete userObject.tokens
+    // return the object
+    return userObject
+}
 
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
@@ -55,6 +84,13 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user
 }
 
+userSchema.methods.generateAuthToken = async function () {
+    const user = this
+    const token = jwt.sign({ _id: user._id.toString() }, 'thisismynewcourse')
+    user.tokens = user.tokens.concat({ token })
+    await user.save()
+    return token
+}
 
 // hash plain text password before saving
 userSchema.pre('save', async function (next) {
@@ -62,7 +98,14 @@ userSchema.pre('save', async function (next) {
     if (user.isModified('password')){
         user.password = await bcrypt.hash(user.password, 8)
     }
-    console.log('just before saving')
+    //console.log('just before saving')
+    next()
+})
+
+userSchema.pre('remove', async function (next) {
+    const user = this
+    await Task.deleteMany({ owner: user._id })
+    console.log('Deleting all user tasks...')
     next()
 })
 
