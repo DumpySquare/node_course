@@ -1,2 +1,13 @@
 
 node_modules
+images
+avatars
+.vscode
+config
+testFiles
+*.jpg
+*.png
+*.doc
+*.docx
+*.pdf
+*.env
