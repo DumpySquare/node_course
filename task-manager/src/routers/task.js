@@ -20,20 +20,50 @@ router.post('/tasks', auth, async (req, res) => {
     }
 })
 
-// Get tasks
+// Get tasks?completed=true
+// GET tasks?limit=10&skip=0
 router.get('/tasks', auth, async (req, res) => {
+    const match = {}
+    const sort = {}
+
+    console.log('/tasks - ', req.user.name)
+    // if the query parameter complete is there
+    if (req.query.completed) {
+        // make boolean true if value is "true"
+        match.completed = req.query.completed === 'true'
+        console.log('/tasks query parameter = ', req.query.completed)
+    } else {
+        console.log('/tasks - no query parameter supplied')
+    }
+
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+        console.log('/tasks - sort: ', sort)
+    }
+
     try {
         // // option 1 - return tasks with user ID matching current user
         //const tasks = await Task.find({ owner: req.user._id })
         //res.send(tasks)
 
         // // option 2 - populate all tasks by looking up user by ID and finding associated tasks
-        await req.user.populate('tasks').execPopulate()
+        await req.user.populate({
+            path: 'tasks',
+            match,
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
         res.send(req.user.tasks)
     } catch (e) {
         res.status(500).send()
     }
 })
+
+// GET /tasks?completed=true
 
 // get task by id
 router.get('/tasks/:id', auth, async (req, res) => {

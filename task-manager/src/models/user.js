@@ -48,7 +48,13 @@ const userSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    avatar: {
+        type: Buffer
+    }
+},
+{
+    timestamps: true
 })
 
 // associates owner field of a Task with the local user field _id
@@ -75,10 +81,12 @@ userSchema.methods.toJSON = function () {
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
     if (!user) {
+        console.log('User not found by email')
         throw new Error('Unable to login-')
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
+        console.log('User input password hash does not match hash in DB')
         throw new Error('Unable to login')
     }
     return user
@@ -89,6 +97,7 @@ userSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign({ _id: user._id.toString() }, 'thisismynewcourse')
     user.tokens = user.tokens.concat({ token })
     await user.save()
+    console.log('Auth token generatored')
     return token
 }
 
@@ -98,7 +107,7 @@ userSchema.pre('save', async function (next) {
     if (user.isModified('password')){
         user.password = await bcrypt.hash(user.password, 8)
     }
-    //console.log('just before saving')
+    console.log('Hashing password before save')
     next()
 })
 
