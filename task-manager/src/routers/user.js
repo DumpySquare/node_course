@@ -1,14 +1,17 @@
 const express = require('express')
 const multer = require('multer')
+const sharp = require('sharp')
 const User = require('../models/user')
-const router = new express.Router()
 const auth = require('../middleware/auth')
+const { sendWelcomeEmail, sendCancelEmail } = require('../emails/account')
+const router = new express.Router()
 
 // create user
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
     try {
         await user.save()
+        sendWelcomeEmail(user.email, user.name)
         const token = await user.generateAuthToken()
         res.status(201).send({ user, token })
     } catch (e) {
@@ -58,7 +61,7 @@ router.post('/users/logoutAll', auth, async (req, res) => {
         // try to clear all user tokens, then save user and respond
         //console.log('current user tokens from logout all: ', req.user.tokens)
         req.user.tokens = [];
-        //console.log('cleared user tokens from logout all: ', req.user.tokens)
+        console.log('cleared user tokens from logout all: ', req.user.tokens)
         await req.user.save()
         res.send('All Sessions logged out')
     } catch (e) {
@@ -99,7 +102,7 @@ router.patch('/users/me', auth, async (req, res) => {
         await req.user.save()
         res.send(req.user)
     } catch (e) {
-        // something hrouterened with the query, respond with error
+        // something happened with the query, respond with error
         res.status(400).send(e)
     }
 })
@@ -107,16 +110,18 @@ router.patch('/users/me', auth, async (req, res) => {
 // delete user
 router.delete('/users/me', auth,  async (req, res) => {
     try { 
+        // TODO: troubleshoot why cancelation email causes http500
+        //sendCancelEmail(user.email, user.name)
         await req.user.remove()
         res.send(req.user)
+        console.log('Deleting user-self and sending email')
     } catch (e) {
         res.status(500).send()
     }
 })
 
-
+// setup multer for multi-part file uploads
 const upload = multer({
-    dest: 'avatars',
     limits: {
         fileSize: 1000000
     },
@@ -130,10 +135,38 @@ const upload = multer({
     }
 })
 
-router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+router.post('/users/me/avatar', auth,  upload.single('avatar'), async (req, res) => {
+    const buffer = await sharp(req.file.buffer).png().resize({ width: 250, height: 250 }).toBuffer()
+    req.user.avatar = buffer
+    console.log("user avatar name:", req.user.name, req.user.email)
+    console.log("user avatar buffer:", req.user.avatar)
+    await req.user.save()
+    console.log("Saving user avatar")
     res.send()
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message })
+})
+
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    req.user.avatar = undefined
+    console.log("Deleting user avatar", req.user.name, req.user.email)
+    await req.user.save()
+    res.send()
+})
+
+router.get('/users/:id/avatar', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+
+        if (!user || !user.avatar) {
+            throw new Error()
+        }
+
+        res.set('Content-Type', 'image/png')
+        res.send(user.avatar)
+    } catch (e) {
+        res.status(404).send('Avatar image not found')
+    }
 })
 
 module.exports = router

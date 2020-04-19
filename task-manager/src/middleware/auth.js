@@ -7,7 +7,7 @@ const auth = async (req, res, next) => {
         // get auth token from request header, removing "Bearer " prefix
         const token = req.header('Authorization').replace('Bearer ', '')
         // decode token with psk
-        const decoded = jwt.verify(token, 'thisismynewcourse')
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
         // lookup user by decoded id and validate token against valid tokens associated with the user account
         const user = await User.findOne({ _id: decoded._id, 'tokens.token': token})
         //console.log(token)
