@@ -35,6 +35,12 @@ Deploying subtree of git project to heroku
 
     https://medium.com/@shalandy/deploy-git-subdirectory-to-heroku-ea05e95fce1f
 
+
+## Cleaning information from a git
+
+    https://help.github.com/en/github/authenticating-to-github/removing-sensitive-data-from-a-repository
+    https://gist.github.com/vinnie357/f73daf15585ec586e0307090cb9a66ae 
+
 ---
 
 # node install mgmt

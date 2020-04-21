@@ -82,20 +82,12 @@ userSchema.methods.toJSON = function () {
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
     if (!user) {
-<<<<<<< HEAD
         //console.log('User not found by email')
-=======
-        console.log('User not found by email')
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
         throw new Error('Unable to login-')
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-<<<<<<< HEAD
         //console.log('User input password hash does not match hash in DB')
-=======
-        console.log('User input password hash does not match hash in DB')
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
         throw new Error('Unable to login')
     }
     return user
@@ -106,11 +98,7 @@ userSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET)
     user.tokens = user.tokens.concat({ token })
     await user.save()
-<<<<<<< HEAD
     //console.log('Auth token generatored')
-=======
-    console.log('Auth token generatored')
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
     return token
 }
 
@@ -120,22 +108,14 @@ userSchema.pre('save', async function (next) {
     if (user.isModified('password')){
         user.password = await bcrypt.hash(user.password, 8)
     }
-<<<<<<< HEAD
     //console.log('Hashing password before save')
-=======
-    console.log('Hashing password before save')
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
     next()
 })
 
 userSchema.pre('remove', async function (next) {
     const user = this
     task = await Task.deleteMany({ owner: user._id })
-<<<<<<< HEAD
     //console.log(`Deleting all ${user.name} task: ${task}`)
-=======
-    console.log(`Deleting all ${user.name} task: ${task}`)
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
     next()
 })
 

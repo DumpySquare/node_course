@@ -23,11 +23,7 @@ router.post('/users', async (req, res) => {
 router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
-<<<<<<< HEAD
-        ////console.log('in post login router', req.body.email, req.body.password)
-=======
         //console.log('in post login router', req.body.email, req.body.password)
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
         const token = await user.generateAuthToken()
         res.send({ user, token })
     } catch (e) {
@@ -45,11 +41,7 @@ router.post('/users/logout', auth, async (req, res) => {
         //    existing auth tokens to pass/fail auth, which is where we get req.user.tokens
         // req.user contains the user and tokens in the db
         // req.token contains the token the user provided in the post
-<<<<<<< HEAD
-        ////console.log('current user tokens from regular logout: ', req.user.tokens)
-=======
         //console.log('current user tokens from regular logout: ', req.user.tokens)
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
         req.user.tokens = req.user.tokens.filter((token) => {
             // return true for all the tokens on the user account that were not used for this request
             return token.token !== req.token
@@ -67,15 +59,9 @@ router.post('/users/logout', auth, async (req, res) => {
 router.post('/users/logoutAll', auth, async (req, res) => {
     try {
         // try to clear all user tokens, then save user and respond
-<<<<<<< HEAD
-        ////console.log('current user tokens from logout all: ', req.user.tokens)
-        req.user.tokens = [];
-        //console.log('cleared user tokens from logout all: ', req.user.tokens)
-=======
         //console.log('current user tokens from logout all: ', req.user.tokens)
         req.user.tokens = [];
-        console.log('cleared user tokens from logout all: ', req.user.tokens)
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
+        //console.log('cleared user tokens from logout all: ', req.user.tokens)
         await req.user.save()
         res.send('All Sessions logged out')
     } catch (e) {
@@ -128,11 +114,7 @@ router.delete('/users/me', auth,  async (req, res) => {
         //sendCancelEmail(user.email, user.name)
         await req.user.remove()
         res.send(req.user)
-<<<<<<< HEAD
         //console.log('Deleting user-self and sending email')
-=======
-        console.log('Deleting user-self and sending email')
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
     } catch (e) {
         res.status(500).send()
     }
@@ -156,17 +138,10 @@ const upload = multer({
 router.post('/users/me/avatar', auth,  upload.single('avatar'), async (req, res) => {
     const buffer = await sharp(req.file.buffer).png().resize({ width: 250, height: 250 }).toBuffer()
     req.user.avatar = buffer
-<<<<<<< HEAD
     //console.log("user avatar name:", req.user.name, req.user.email)
     //console.log("user avatar buffer:", req.user.avatar)
     await req.user.save()
     //console.log("Saving user avatar")
-=======
-    console.log("user avatar name:", req.user.name, req.user.email)
-    console.log("user avatar buffer:", req.user.avatar)
-    await req.user.save()
-    console.log("Saving user avatar")
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
     res.send()
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message })
@@ -174,11 +149,7 @@ router.post('/users/me/avatar', auth,  upload.single('avatar'), async (req, res)
 
 router.delete('/users/me/avatar', auth, async (req, res) => {
     req.user.avatar = undefined
-<<<<<<< HEAD
     //console.log("Deleting user avatar", req.user.name, req.user.email)
-=======
-    console.log("Deleting user avatar", req.user.name, req.user.email)
->>>>>>> 46c46a53bbb50c032f49c79eef7a8aeb71ace689
     await req.user.save()
     res.send()
 })
