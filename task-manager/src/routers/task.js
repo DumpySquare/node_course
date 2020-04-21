@@ -26,20 +26,20 @@ router.get('/tasks', auth, async (req, res) => {
     const match = {}
     const sort = {}
 
-    console.log('/tasks - ', req.user.name)
+    //console.log('/tasks - ', req.user.name)
     // if the query parameter complete is there
     if (req.query.completed) {
         // make boolean true if value is "true"
         match.completed = req.query.completed === 'true'
-        console.log('/tasks query parameter = ', req.query.completed)
+        //console.log('/tasks query parameter = ', req.query.completed)
     } else {
-        console.log('/tasks - no query parameter supplied')
+        //console.log('/tasks - no query parameter supplied')
     }
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
         sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
-        console.log('/tasks - sort: ', sort)
+        //console.log('/tasks - sort: ', sort)
     }
 
     try {

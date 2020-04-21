@@ -82,12 +82,12 @@ userSchema.methods.toJSON = function () {
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
     if (!user) {
-        console.log('User not found by email')
+        //console.log('User not found by email')
         throw new Error('Unable to login-')
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-        console.log('User input password hash does not match hash in DB')
+        //console.log('User input password hash does not match hash in DB')
         throw new Error('Unable to login')
     }
     return user
@@ -98,7 +98,7 @@ userSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET)
     user.tokens = user.tokens.concat({ token })
     await user.save()
-    console.log('Auth token generatored')
+    //console.log('Auth token generatored')
     return token
 }
 
@@ -108,14 +108,14 @@ userSchema.pre('save', async function (next) {
     if (user.isModified('password')){
         user.password = await bcrypt.hash(user.password, 8)
     }
-    console.log('Hashing password before save')
+    //console.log('Hashing password before save')
     next()
 })
 
 userSchema.pre('remove', async function (next) {
     const user = this
     task = await Task.deleteMany({ owner: user._id })
-    console.log(`Deleting all ${user.name} task: ${task}`)
+    //console.log(`Deleting all ${user.name} task: ${task}`)
     next()
 })
 

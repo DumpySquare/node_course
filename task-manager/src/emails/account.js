@@ -19,9 +19,9 @@ const sendCancelEmail = (email, name) => {
         subject: 'Sorry to see you go',
         text: `Hey ${name}, your still pretty awesome...`
     }).then(() => {
-        console.log('Message Sent')
+        //console.log('Message Sent')
     }).catch((error) => {
-        console.log(error.response.body)
+        //console.log(error.response.body)
     })
 }
 
